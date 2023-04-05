@@ -30,7 +30,7 @@ public class ProxyCache {
 
 	/* Read request */
 	try {
-	    BufferedReader fromClient = new BufferedReader(new InputStreamReader(System.in));
+	    BufferedReader fromClient = new BufferedReader(new InputStreamReader(client.getInputStream()));
 	    request = new HttpRequest(fromClient);
 	} catch (IOException e) {
 	    System.out.println("Error reading request from client: " + e);
@@ -41,7 +41,8 @@ public class ProxyCache {
 	    /* Open socket and write request to socket */
 	    server = socket.accept();
 	    DataOutputStream toServer = new DataOutputStream(server.getOutputStream());
-	    /* Fill in */
+	    toServer.writeUTF(request.toString());
+		toServer.flush();
 	} catch (UnknownHostException e) {
 	    System.out.println("Unknown host: " + request.getHost());
 	    System.out.println(e);
@@ -54,8 +55,8 @@ public class ProxyCache {
 	try {
 	    DataInputStream fromServer = new DataInputStream(server.getInputStream());
 	    response = new HttpResponse(fromServer);
-	    DataOutputStream toClient = 1;
-	    /* Fill in */
+	    DataOutputStream toClient = new DataOutputStream(server.getOutputStream());
+	    
 	    /* Write response to client. First headers, then body */
 	    client.close();
 	    server.close();
